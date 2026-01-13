@@ -70,7 +70,7 @@ export default function Navbar() {
   const mainNavLinks = [
     { 
       href: "/activities", 
-      label: "কর্মকান্ড", 
+      label: "কার্যক্রম", 
       hasSubmenu: true,
       submenu: activitiesSubmenu 
     },
@@ -123,8 +123,8 @@ export default function Navbar() {
               <div className="relative group">
                 <div className="absolute -inset-2 bg-gradient-to-r from-green-500 to-green-700 rounded-full blur opacity-0 group-hover:opacity-30 transition duration-500"></div>
                 <img
-                  src="/kh.jpg"
-                  alt="খালিদ সাইফুল্লাহ জুয়েল"
+                  src="/jewel.png"
+                  alt="খালেদ সাইফুল্লাহ জুয়েল"
                   className="relative h-14 w-14 md:h-16 md:w-16 object-cover rounded-full border-4 border-white shadow-lg group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute -bottom-1 -right-1 h-6 w-6 bg-green-600 rounded-full border-3 border-white shadow-sm flex items-center justify-center">
@@ -134,7 +134,7 @@ export default function Navbar() {
 
               <div className="leading-tight">
                 <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 font-bangla group-hover:text-green-800 transition-colors duration-300">
-                  খালিদ সাইফুল্লাহ জুয়েল
+                  খালেদ সাইফুল্লাহ জুয়েল
                 </h1>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-1 bg-gradient-to-r from-green-500 to-green-700 rounded-full"></div>
@@ -271,7 +271,7 @@ export default function Navbar() {
                                 ? "bg-green-100 text-green-700"
                                 : "bg-green-50 text-green-600"
                             }`}>
-                              {link.label === "কর্মকান্ড" ? (
+                              {link.label === "কার্যক্রম" ? (
                                 <Activity className="h-5 w-5" />
                               ) : (
                                 <Calendar className="h-5 w-5" />
@@ -371,7 +371,7 @@ export default function Navbar() {
               {/* Contact Info */}
               <div className="mt-6 pt-4 border-t border-green-100 text-center">
                 <p className="text-xs text-gray-500">
-                  © {new Date().getFullYear()} খালিদ সাইফুল্লাহ জুয়েল। সকল অধিকার সংরক্ষিত।
+                  © {new Date().getFullYear()} খালেদ সাইফুল্লাহ জুয়েল। সকল অধিকার সংরক্ষিত।
                 </p>
               </div>
             </div>

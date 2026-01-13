@@ -24,7 +24,7 @@ export default function PoliticalActivitiesPage() {
         {/* Page Header */}
         <div className="mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            রাজনৈতিক কর্মকান্ড
+            রাজনৈতিক কার্যক্রম
           </h1>
           <p className="text-lg text-gray-600">
             সুশাসন ও স্বচ্ছ রাজনীতির মাধ্যমে একটি উন্নত সমাজ গঠনে আমার রাজনৈতিক কার্যক্রম
@@ -76,7 +76,7 @@ export default function PoliticalActivitiesPage() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            কর্মকান্ড পেইজে ফিরে যান
+            কার্যক্রম পেইজে ফিরে যান
           </a>
         </div>
       </div>

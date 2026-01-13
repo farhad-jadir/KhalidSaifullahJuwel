@@ -14,12 +14,12 @@ export default function Footer() {
               <div className="relative">
                 <img
                   src="/kh.jpg"
-                  alt="খালিদ সাইফুল্লাহ জুয়েল"
+                  alt="খালেদ সাইফুল্লাহ জুয়েল"
                   className="h-12 w-12 object-cover rounded-full border-2 border-primary-500"
                 />
               </div>
               <div>
-                <h3 className="text-xl font-bold font-bangla">খালিদ সাইফুল্লাহ জুয়েল</h3>
+                <h3 className="text-xl font-bold font-bangla">খালেদ সাইফুল্লাহ জুয়েল</h3>
                 <p className="text-sm text-gray-300">রাজনীতিবিদ</p>
               </div>
             </div>
@@ -135,7 +135,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-400 text-sm text-center md:text-left">
-            © {currentYear} খালিদ সাইফুল্লাহ জুয়েল। সর্বস্বত্ব সংরক্ষিত।
+            © {currentYear} খালেদ সাইফুল্লাহ জুয়েল। সর্বস্বত্ব সংরক্ষিত।
           </p>
           <div className="flex gap-6 text-sm text-gray-400">
             <a href="/privacy" className="hover:text-white transition-colors">গোপনীয়তা নীতি</a>

@@ -9,7 +9,7 @@ const notoSerifBengali = Noto_Serif_Bengali({
 });
 
 export const metadata = {
-  title: "খালিদ সাইফুল্লাহ জুয়েল - রাজনীতিবিদ",
+  title: "খালেদ সাইফুল্লাহ জুয়েল - রাজনীতিবিদ",
   description: "জনসেবাই আমার রাজনীতির প্রধান লক্ষ্য",
 };
 

@@ -6,7 +6,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              খালিদ সাইফুল্লাহ জুয়েল
+              খালেদ সাইফুল্লাহ জুয়েল
             </h1>
             <p className="text-xl md:text-2xl text-green-700 mb-8">
               রাজনীতিবিদ | সমাজসেবক
@@ -37,10 +37,10 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { title: "রাজনৈতিক কর্মকান্ড", desc: "সুশাসন ও স্বচ্ছ রাজনীতির জন্য কাজ করছি" },
-              { title: "সামাজিক কর্মকান্ড", desc: "সমাজের উন্নয়নে বিভিন্ন সামাজিক কাজ" },
-              { title: "সৃজনশীল কর্মকান্ড", desc: "তরুণদের সৃজনশীলতা বিকাশে কাজ" },
-              { title: "উন্নয়নমূলক কর্মকান্ড", desc: "অঞ্চলের উন্নয়নে অবদান" }
+              { title: "রাজনৈতিক কার্যক্রম", desc: "সুশাসন ও স্বচ্ছ রাজনীতির জন্য কাজ করছি" },
+              { title: "সামাজিক কার্যক্রম", desc: "সমাজের উন্নয়নে বিভিন্ন সামাজিক কাজ" },
+              { title: "সৃজনশীল কার্যক্রম", desc: "তরুণদের সৃজনশীলতা বিকাশে কাজ" },
+              { title: "উন্নয়নমূলক কার্যক্রম", desc: "অঞ্চলের উন্নয়নে অবদান" }
             ].map((item, index) => (
               <div key={index} className="bg-green-50 p-6 rounded-xl border border-green-200 hover:shadow-lg transition-shadow duration-300">
                 <h3 className="text-xl font-bold text-green-800 mb-3">{item.title}</h3>
