@@ -30,7 +30,7 @@ export default function RootLayout({
         <footer className="bg-gradient-to-r from-green-800 to-green-900 text-white py-8 mt-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <p className="text-sm">© {new Date().getFullYear()} খালিদ সাইফুল্লাহ জুয়েল। সকল অধিকার সংরক্ষিত।</p>
+              <p className="text-sm">© {new Date().getFullYear()} খালেদ সাইফুল্লাহ জুয়েল। সকল অধিকার সংরক্ষিত।</p>
               <p className="text-sm mt-2">জনসেবাই আমার রাজনীতির প্রধান লক্ষ্য</p>
             </div>
           </div>

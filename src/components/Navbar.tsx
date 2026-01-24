@@ -53,10 +53,10 @@ export default function Navbar() {
 
   // Activities submenu items
   const activitiesSubmenu = [
-    { href: "/activities/political", label: "রাজনৈতিক কর্মকান্ড", icon: <Target className="h-4 w-4" /> },
-    { href: "/activities/social", label: "সামাজিক কর্মকান্ড", icon: <Activity className="h-4 w-4" /> },
-    { href: "/activities/creative", label: "সৃজনশীল কর্মকান্ড", icon: <Lightbulb className="h-4 w-4" /> },
-    { href: "/activities/development", label: "উন্নয়নমূলক কর্মকান্ড", icon: <TrendingUp className="h-4 w-4" /> },
+    { href: "/activities/political", label: "রাজনৈতিক কার্যক্রম", icon: <Target className="h-4 w-4" /> },
+    { href: "/activities/social", label: "সামাজিক কার্যক্রম", icon: <Activity className="h-4 w-4" /> },
+    { href: "/activities/creative", label: "সৃজনশীল কার্যক্রম", icon: <Lightbulb className="h-4 w-4" /> },
+    { href: "/activities/development", label: "উন্নয়নমূলক কার্যক্রম", icon: <TrendingUp className="h-4 w-4" /> },
   ];
 
   // News submenu items
@@ -371,7 +371,7 @@ export default function Navbar() {
               {/* Contact Info */}
               <div className="mt-6 pt-4 border-t border-green-100 text-center">
                 <p className="text-xs text-gray-500">
-                  © {new Date().getFullYear()} খালেদ সাইফুল্লাহ জুয়েল। সকল অধিকার সংরক্ষিত।
+                  © {new Date().getFullYear()} ।খালেদ সাইফুল্লাহ জুয়েল। সকল অধিকার সংরক্ষিত
                 </p>
               </div>
             </div>
