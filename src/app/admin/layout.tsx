@@ -1,225 +1,114 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-import { useRouter, usePathname } from "next/navigation";
+import React, { useState } from "react";
 import Link from "next/link";
-import {
-  Home,
-  Users,
-  FileText,
-  Settings,
-  BarChart,
-  Calendar,
-  Package,
-  Bell,
-  Menu,
-  X,
-  LogOut,
-  Shield,
+import { usePathname } from "next/navigation";
+import { 
+  LayoutDashboard, 
+  Users, 
+  Calendar, 
+  MessageSquare, 
+  Settings, 
+  LogOut, 
+  Menu, 
+  X 
 } from "lucide-react";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push("/admin");
-      } else {
-        setUser(user);
-      }
-      setLoading(false);
-    };
-    getUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "SIGNED_OUT") {
-          router.push("/admin");
-        }
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
-  }, [router]);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/admin");
-  };
-
-  const navItems = [
-    { name: "Dashboard", href: "/admin/dashboard", icon: Home },
-    { name: "Users", href: "/admin/users", icon: Users },
-    { name: "Content", href: "/admin/content", icon: FileText },
-    { name: "Products", href: "/admin/products", icon: Package },
-    { name: "Analytics", href: "/admin/analytics", icon: BarChart },
-    { name: "Calendar", href: "/admin/calendar", icon: Calendar },
-    { name: "Settings", href: "/admin/settings", icon: Settings },
+  // মেনু আইটেমগুলো এখানে ডিফাইন করা হয়েছে
+  const menuItems = [
+    { name: "ড্যাশবোর্ড", href: "/admin/dashboard", icon: LayoutDashboard },
+    { name: "কর্মী ব্যবস্থাপনা", href: "/admin/workers", icon: Users },
+    { name: "ইভেন্ট ও সভা", href: "/admin/events", icon: Calendar },
+    { name: "জনগণের মেসেজ", href: "/admin/messages", icon: MessageSquare },
+    { name: "সেটিংস", href: "/admin/settings", icon: Settings },
   ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar toggle */}
+    <div className="flex min-h-screen bg-gray-100 font-sans">
+      {/* মোবাইল মেনু বাটন */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 bg-white rounded-lg shadow"
+          onClick={() => setSidebarOpen(!isSidebarOpen)}
+          className="p-2 bg-slate-900 text-white rounded-md shadow-md"
         >
-          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+          {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Overlay for mobile */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
+      {/* Sidebar - বামদিকের মেনু */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 transition-transform duration-300 ease-in-out`}
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-950 text-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
-        <div className="h-full flex flex-col">
-          {/* Logo */}
-          <div className="p-6 border-b">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-                <Shield className="text-white" size={20} />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold">Admin Panel</h2>
-                <p className="text-xs text-gray-500">Version 1.0</p>
-              </div>
-            </div>
+        <div className="p-6 flex flex-col h-full">
+          {/* লোগো বা নাম */}
+          <div className="mb-10">
+            <h1 className="text-xl font-bold text-blue-400 tracking-wider">
+              অ্যাডমিন প্যানেল
+            </h1>
+            <p className="text-xs text-slate-400 mt-1 uppercase tracking-widest">
+              রাজনীতিবিদ ড্যাশবোর্ড
+            </p>
           </div>
 
-          {/* User Info */}
-          <div className="p-4 border-b">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold">
-                  {user?.email?.[0]?.toUpperCase() || "A"}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">
-                  {user?.email || "Admin User"}
-                </p>
-                <p className="text-xs text-gray-500">Administrator</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 p-4 overflow-y-auto">
-            <ul className="space-y-2">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.href;
-                return (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                        isActive
-                          ? "bg-black text-white"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                      onClick={() => setSidebarOpen(false)}
-                    >
-                      <Icon size={20} />
-                      <span>{item.name}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+          {/* নেভিগেশন লিঙ্ক */}
+          <nav className="flex-1 space-y-2">
+            {menuItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                    isActive
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
+                      : "text-slate-400 hover:bg-slate-900 hover:text-white"
+                  }`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <item.icon size={20} />
+                  <span className="font-medium">{item.name}</span>
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Logout Button */}
-          <div className="p-4 border-t">
+          {/* লগআউট বাটন */}
+          <div className="mt-auto pt-6 border-t border-slate-800">
             <button
-              onClick={handleLogout}
-              className="flex items-center space-x-3 px-4 py-3 w-full text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              onClick={() => {/* সুপাবেস সাইন আউট ফাংশন এখানে হবে */}}
+              className="flex items-center gap-3 px-4 py-3 w-full text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
             >
               <LogOut size={20} />
-              <span>Logout</span>
+              <span className="font-medium text-lg">লগআউট</span>
             </button>
           </div>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="lg:ml-64 min-h-screen">
-        {/* Header */}
-        <header className="sticky top-0 z-30 bg-white border-b">
-          <div className="flex items-center justify-between px-6 py-4">
-            <div>
-              <h1 className="text-2xl font-bold">
-                {navItems.find((item) => item.href === pathname)?.name || "Dashboard"}
-              </h1>
-              <p className="text-sm text-gray-500">
-                Welcome back, {user?.email?.split("@")[0] || "Admin"}
-              </p>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <button className="relative p-2 hover:bg-gray-100 rounded-lg">
-                <Bell size={20} />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
-              
-              <div className="hidden lg:flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-semibold">
-                    {user?.email?.[0]?.toUpperCase() || "A"}
-                  </span>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">{user?.email || "Admin"}</p>
-                  <p className="text-xs text-gray-500">Admin</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <div className="p-6">
+      {/* Main Content Area - ডানদিকের অংশ */}
+      <main className="flex-1 flex flex-col min-w-0">
+        <div className="p-4 lg:p-8 overflow-y-auto">
           {children}
         </div>
       </main>
+
+      {/* মোবাইল স্ক্রিনে সাইডবার খোলা থাকলে ব্যাকগ্রাউন্ড আবছা করার জন্য */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 }
