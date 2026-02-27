@@ -1,464 +1,1052 @@
-//app/news/election/page.tsx
+// app/news/election/page.tsx
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { 
+  TrendingUp, 
+  Users, 
+  MapPin, 
+  Clock, 
+  BarChart3, 
+  Award,
+  ChevronRight,
+  Calendar,
+  PieChart,
+  Newspaper,
+  Filter,
+  Search,
+  ThumbsUp,
+  MessageCircle,
+  Share2,
+  Bookmark,
+  Flame,
+  Star,
+  Activity,
+  X,
+  Eye,
+  Facebook,
+  Twitter,
+  Linkedin,
+  Link as LinkIcon,
+  Check,
+  AlertCircle,
+  ArrowLeft
+} from 'lucide-react';
+import { electionNewsApi, pollApi, trendingApi, eventsApi, statsApi, subscriberApi } from '@/lib/supabase/election';
 import Image from 'next/image';
+import Link from 'next/link';
 
-export default function ElectionNewsPage() {
-  const electionCategories = [
-    {
-      category: "জাতীয় নির্বাচন",
-      news: [
-        {
-          title: "১২তম জাতীয় সংসদ নির্বাচন: প্রস্তুতি ও প্রত্যাশা",
-          date: "১৫ মার্চ, ২০২৪",
-          description: "আসন্ন জাতীয় সংসদ নির্বাচনের প্রস্তুতি নিয়ে কেন্দ্রীয় কমিটির সাথে মতবিনিময় সভা। নির্বাচনী প্রস্তুতি ও কৌশল নির্ধারণে আলোচনা চলছে।",
-          location: "ঢাকা",
-          type: "মতবিনিময়",
-          featured: true,
-          image: "/news/election-1.jpg",
-          author: "রিপোর্টার: মোহাম্মদ আলী",
-          views: "২,৫০০+",
-          readTime: "৩ মিনিট"
-        },
-        {
-          title: "জাতীয় নির্বাচনী ইশতেহার প্রকাশ: ৫০ পৃষ্ঠার উন্নয়ন রোডম্যাপ",
-          date: "১০ মার্চ, ২০২৪",
-          description: "জনগণের আশা-আকাঙ্ক্ষার প্রতিফলন ঘটিয়ে ৫০ পৃষ্ঠার পূর্ণাঙ্গ নির্বাচনী ইশতেহার প্রকাশ। শিক্ষা, স্বাস্থ্য, অর্থনীতি ও যুব উন্নয়নে বিশেষ অঙ্গীকার।",
-          location: "নরসিংদী",
-          type: "ইশতেহার",
-          featured: true,
-          image: "/news/manifesto.jpg",
-          author: "রিপোর্টার: সুমাইয়া আক্তার",
-          views: "৩,৮০০+",
-          readTime: "৫ মিনিট"
-        },
-        {
-          title: "জাতীয় পর্যায়ে ভোটার সচেতনতা: ডিজিটাল ও মাঠ পর্যায়ে যৌথ অভিযান",
-          date: "৫ মার্চ, ২০২৪",
-          description: "ভোটারদের মধ্যে সচেতনতা বৃদ্ধিতে বিশেষ কার্যক্রম। ডিজিটাল প্ল্যাটফর্ম ও মাঠ পর্যায়ে গণসচেতনতা প্রচারণা জোরদার।",
-          location: "গাজীপুর",
-          type: "সচেতনতা",
-          featured: false,
-          image: "/news/voter-awareness.jpg",
-          author: "রিপোর্টার: রফিকুল ইসলাম",
-          views: "১,৯০০+",
-          readTime: "২ মিনিট"
-        }
-      ]
-    },
-    {
-      category: "স্থানীয় সরকার নির্বাচন",
-      news: [
-        {
-          title: "উপজেলা পরিষদ নির্বাচন: সরাসরি জনসংযোগ অভিযান",
-          date: "২৫ ফেব্রুয়ারি, ২০২৪",
-          description: "উপজেলা পর্যায়ের নির্বাচনী প্রচারণা কার্যক্রম শুরু। প্রতিটি ওয়ার্ডে সরাসরি জনসংযোগ ও মতবিনিময় সভা চলছে।",
-          location: "বেলাবো",
-          type: "প্রচারণা",
-          featured: false,
-          image: "/news/local-election.jpg",
-          author: "স্থানীয় প্রতিনিধি",
-          views: "১,২০০+",
-          readTime: "৪ মিনিট"
-        },
-        {
-          title: "ইউনিয়ন পরিষদ নির্বাচন প্রস্তুতি: নেতা-কর্মীদের বিশেষ প্রশিক্ষণ",
-          date: "২০ ফেব্রুয়ারি, ২০২৪",
-          description: "ইউনিয়ন পরিষদ নির্বাচনের প্রস্তুতি নিয়ে স্থানীয় নেতা-কর্মীদের সাথে কর্মশালা ও প্রশিক্ষণ সম্পন্ন।",
-          location: "শিবপুর",
-          type: "প্রশিক্ষণ",
-          featured: false,
-          image: "/news/training.jpg",
-          author: "রিপোর্টার: কামরুল হাসান",
-          views: "৯৫০+",
-          readTime: "৩ মিনিট"
-        }
-      ]
-    },
-    {
-      category: "নির্বাচনী সংস্কার",
-      news: [
-        {
-          title: "ডিজিটাল ভোটিং সিস্টেম: স্বচ্ছ নির্বাচনের নতুন অধ্যায়",
-          date: "১০ ফেব্রুয়ারি, ২০২৪",
-          description: "স্বচ্ছ ও নির্ভুল ভোটিং নিশ্চিত করতে ডিজিটাল ভোটিং সিস্টেম চালুর প্রস্তাবনা ও পাইলট প্রকল্প শুরু হয়েছে।",
-          location: "ঢাকা",
-          type: "প্রযুক্তি",
-          featured: true,
-          image: "/news/digital-voting.jpg",
-          author: "টেক রিপোর্টার",
-          views: "৪,২০০+",
-          readTime: "৬ মিনিট"
-        },
-        {
-          title: "নির্বাচন কমিশনের সাথে বিশেষ সংলাপ: স্বচ্ছতার অঙ্গীকার",
-          date: "৫ ফেব্রুয়ারি, ২০২৪",
-          description: "স্বচ্ছ ও গ্রহণযোগ্য নির্বাচন নিশ্চিত করতে নির্বাচন কমিশনের সাথে সংলাপ ও মতবিনিময় সভা অনুষ্ঠিত।",
-          location: "নির্বাচন কমিশন",
-          type: "সংলাপ",
-          featured: false,
-          image: "/news/ec-meeting.jpg",
-          author: "রাজনৈতিক প্রতিবেদক",
-          views: "২,১০০+",
-          readTime: "৩ মিনিট"
-        }
-      ]
+// Types
+interface ElectionNews {
+  id: string;
+  title: string;
+  slug: string;
+  category: string;
+  party: string;
+  region: string;
+  content?: string;
+  image_url?: string;
+  trending: boolean;
+  featured: boolean;
+  likes: number;
+  comments: number;
+  views: number;
+  published_at: string;
+}
+
+interface PollData {
+  id: string;
+  party: string;
+  percentage: number;
+  color_from: string;
+  color_to: string;
+}
+
+interface TrendingTopic {
+  id: string;
+  topic: string;
+  posts: number;
+}
+
+interface UpcomingEvent {
+  id: string;
+  title: string;
+  description: string;
+  event_date: string;
+  location: string;
+  party: string;
+  image_url?: string;
+}
+
+interface SiteStats {
+  total_news: number;
+  total_constituencies: number;
+  total_candidates: number;
+  pending_seats: number;
+  online_users: number;
+  trending_news: number;
+}
+
+// Helper function to convert numbers to Bangla
+const toBanglaNumber = (num: number): string => {
+  const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  return num.toString().replace(/\d/g, digit => banglaDigits[parseInt(digit)]);
+};
+
+// Helper function to format numbers with commas in Bangla
+const formatBanglaNumber = (num: number): string => {
+  return toBanglaNumber(num).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+// Helper function to format date in Bangla
+const formatBanglaDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('bn-BD', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+const ElectionNewsPage = () => {
+  // State management
+  const [electionNews, setElectionNews] = useState<ElectionNews[]>([]);
+  const [pollData, setPollData] = useState<PollData[]>([]);
+  const [trendingTopics, setTrendingTopics] = useState<TrendingTopic[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([]);
+  const [stats, setStats] = useState<SiteStats | null>(null);
+  
+  // UI State
+  const [activeTab, setActiveTab] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [visibleNews, setVisibleNews] = useState<ElectionNews[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [subscribeEmail, setSubscribeEmail] = useState('');
+  const [subscribeLoading, setSubscribeLoading] = useState(false);
+  const [subscribeMessage, setSubscribeMessage] = useState('');
+
+  // News Detail Modal State
+  const [selectedNews, setSelectedNews] = useState<ElectionNews | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [copySuccess, setCopySuccess] = useState('');
+  const [relatedNews, setRelatedNews] = useState<ElectionNews[]>([]);
+
+  // Fetch initial data
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  // Filter news when search, region, or category changes
+  useEffect(() => {
+    filterNews();
+  }, [searchQuery, selectedRegion, selectedCategory, electionNews, activeTab]);
+
+  const fetchAllData = async () => {
+    setIsLoading(true);
+    try {
+      const [newsRes, pollRes, trendingRes, eventsRes, statsRes] = await Promise.all([
+        electionNewsApi.getNews({ limit: 50 }),
+        pollApi.getActivePoll(),
+        trendingApi.getTrendingTopics(),
+        eventsApi.getUpcomingEvents(),
+        statsApi.getStats()
+      ]);
+
+      if (newsRes.data) {
+        setElectionNews(newsRes.data);
+        setVisibleNews(newsRes.data.slice(0, 10));
+      }
+      if (pollRes.data) setPollData(pollRes.data);
+      if (trendingRes.data) setTrendingTopics(trendingRes.data);
+      if (eventsRes.data) setUpcomingEvents(eventsRes.data);
+      if (statsRes.data) setStats(statsRes.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const filterNews = () => {
+    let filtered = [...electionNews];
+
+    // Apply search filter
+    if (searchQuery) {
+      filtered = filtered.filter(news => 
+        news.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        news.category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Apply region filter
+    if (selectedRegion !== 'all') {
+      filtered = filtered.filter(news => news.region === selectedRegion);
+    }
+
+    // Apply category filter
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(news => news.category === selectedCategory);
+    }
+
+    // Apply tab filter
+    switch (activeTab) {
+      case 'trending':
+        filtered = filtered.filter(news => news.trending);
+        break;
+      case 'latest':
+        filtered = filtered.sort((a, b) => 
+          new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+        );
+        break;
+      case 'popular':
+        filtered = filtered.sort((a, b) => b.likes - a.likes);
+        break;
+      default:
+        break;
+    }
+
+    setVisibleNews(filtered.slice(0, 10));
+    setHasMore(filtered.length > 10);
+    setPage(1);
+  };
+
+  const loadMoreNews = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      const start = page * 10;
+      const end = start + 10;
+      let filtered = [...electionNews];
+
+      // Apply same filters
+      if (searchQuery) {
+        filtered = filtered.filter(news => 
+          news.title.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+      if (selectedRegion !== 'all') {
+        filtered = filtered.filter(news => news.region === selectedRegion);
+      }
+      if (selectedCategory !== 'all') {
+        filtered = filtered.filter(news => news.category === selectedCategory);
+      }
+
+      // Apply tab filter
+      switch (activeTab) {
+        case 'trending':
+          filtered = filtered.filter(news => news.trending);
+          break;
+        case 'latest':
+          filtered = filtered.sort((a, b) => 
+            new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+          );
+          break;
+        case 'popular':
+          filtered = filtered.sort((a, b) => b.likes - a.likes);
+          break;
+        default:
+          break;
+      }
+
+      const newNews = filtered.slice(start, end);
+      setVisibleNews(prev => [...prev, ...newNews]);
+      setPage(prev => prev + 1);
+      setHasMore(end < filtered.length);
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  const handleLike = async (newsId: string) => {
+    try {
+      await electionNewsApi.incrementLikes(newsId);
+      // Update local state
+      setElectionNews(prev =>
+        prev.map(news =>
+          news.id === newsId
+            ? { ...news, likes: news.likes + 1 }
+            : news
+        )
+      );
+      
+      // Update selected news if modal is open
+      if (selectedNews?.id === newsId) {
+        setSelectedNews(prev => prev ? { ...prev, likes: prev.likes + 1 } : null);
+        setLiked(true);
+      }
+    } catch (error) {
+      console.error('Error liking news:', error);
+    }
+  };
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubscribeLoading(true);
+    setSubscribeMessage('');
+
+    try {
+      await subscriberApi.subscribe(subscribeEmail);
+      setSubscribeMessage('সাবস্ক্রিপশন সফল হয়েছে! আপনার ইনবক্স চেক করুন।');
+      setSubscribeEmail('');
+      setTimeout(() => {
+        setShowSubscribeModal(false);
+        setSubscribeMessage('');
+      }, 3000);
+    } catch (error) {
+      console.error('Error subscribing:', error);
+      setSubscribeMessage('সাবস্ক্রিপশন ব্যর্থ হয়েছে। আবার চেষ্টা করুন।');
+    } finally {
+      setSubscribeLoading(false);
+    }
+  };
+
+  // News Detail Modal Functions
+  const openNewsDetail = async (news: ElectionNews) => {
+    setSelectedNews(news);
+    setShowDetailModal(true);
+    setShareUrl(`${window.location.origin}/news/election/${news.slug}`);
+    
+    // Increment view count
+    try {
+      await electionNewsApi.incrementViews(news.id);
+      // Update local state
+      setElectionNews(prev =>
+        prev.map(item =>
+          item.id === news.id
+            ? { ...item, views: item.views + 1 }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error('Error incrementing views:', error);
+    }
+
+    // Fetch related news
+    try {
+      const { data } = await electionNewsApi.getNews({
+        region: news.region,
+        limit: 4
+      });
+      if (data) {
+        setRelatedNews(data.filter(n => n.id !== news.id).slice(0, 3));
+      }
+    } catch (error) {
+      console.error('Error fetching related news:', error);
+    }
+  };
+
+  const closeNewsDetail = () => {
+    setShowDetailModal(false);
+    setSelectedNews(null);
+    setLiked(false);
+    setBookmarked(false);
+    setShowShareMenu(false);
+    setCopySuccess('');
+    setRelatedNews([]);
+  };
+
+  const handleShare = (platform: string) => {
+    const text = encodeURIComponent(selectedNews?.title || '');
+    const url = encodeURIComponent(shareUrl);
+
+    switch (platform) {
+      case 'facebook':
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        break;
+      case 'twitter':
+        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+        break;
+      case 'linkedin':
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+        break;
+    }
+    setShowShareMenu(false);
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopySuccess('কপি করা হয়েছে!');
+      setTimeout(() => setCopySuccess(''), 2000);
+    } catch (err) {
+      setCopySuccess('কপি ব্যর্থ');
+    }
+  };
+
+  // Categories for filter
+  const categories = [
+    'সব',
+    'মনোনয়ন',
+    'ইশতেহার',
+    'প্রার্থী',
+    'বিক্ষোভ',
+    'প্রচারণা',
+    'আপডেট'
   ];
 
-  const featuredNews = [
-    {
-      title: "খালেদ সাইফুল্লাহ জুয়েলের নির্বাচনী রোডম্যাপ: পরিবর্তনের অঙ্গীকার",
-      date: "২৮ মার্চ, ২০২৪",
-      summary: "২০২৪ সালের নির্বাচনে খালেদ সাইফুল্লাহ জুয়েলের ১০ দফা নির্বাচনী অঙ্গীকার ও উন্নয়ন পরিকল্পনা নিয়ে বিশেষ প্রতিবেদন।",
-      image: "/news/featured-1.jpg",
-      category: "বিশেষ প্রতিবেদন",
-      readTime: "৮ মিনিট",
-      featured: true
-    },
-    {
-      title: "যুব ভোটারদের অংশগ্রহণ: রেকর্ড সংখ্যক নিবন্ধন",
-      date: "২৫ মার্চ, ২০২৪",
-      summary: "নির্বাচনী বছরকে সামনে রেখে যুব ভোটার নিবন্ধনে রেকর্ড সংখ্যক তরুণ ভোটার নিবন্ধিত হয়েছে।",
-      image: "/news/featured-2.jpg",
-      category: "ভোটার পরিসংখ্যান",
-      readTime: "৪ মিনিট",
-      featured: true
-    }
-  ];
-
-  const upcomingElectionEvents = [
-    {
-      event: "জাতীয় নির্বাচনী সম্মেলন",
-      date: "৩০ মে, ২০২৪",
-      time: "সকাল ১০:০০",
-      location: "নরসিংদী স্টেডিয়াম",
-      description: "আসন্ন জাতীয় নির্বাচন নিয়ে বিশাল সমাবেশ ও জনসভা",
-      image: "/events/rally.jpg"
-    },
-    {
-      event: "যুব ভোটার সংলাপ",
-      date: "৫ জুন, ২০২৪",
-      time: "বিকাল ৪:০০",
-      location: "স্থানীয় কলেজ অডিটোরিয়াম",
-      description: "তরুণ ভোটারদের সাথে সরাসরি সংলাপ ও মতবিনিময়",
-      image: "/events/youth-dialogue.jpg"
-    }
-  ];
-
-  const newspaperColumns = [
-    {
-      title: "প্রধান সম্পাদকীয়",
-      content: "২০২৪ সালের নির্বাচন বাংলাদেশের রাজনীতিতে একটি গুরুত্বপূর্ণ মাইলফলক। এ নির্বাচন শুধু সরকার পরিবর্তনেরই নয়, বরং রাজনৈতিক সংস্কার ও সুশাসন প্রতিষ্ঠারও নির্বাচন। আমাদের দায়িত্ব সচেতন ভোটার হিসেবে সঠিক সিদ্ধান্ত নেওয়া।",
-      author: "প্রধান সম্পাদক",
-      date: "১ এপ্রিল, ২০২৪"
-    },
-    {
-      title: "রাজনৈতিক বিশ্লেষণ",
-      content: "বর্তমান নির্বাচনী প্রেক্ষাপটে বিভিন্ন দলের অবস্থান ও ভবিষ্যৎ কৌশল নিয়ে বিশেষ বিশ্লেষণ। বিশেষজ্ঞদের মতামত ও ভোটারদের মনোভাব নিয়ে বিস্তারিত আলোচনা।",
-      author: "রাজনৈতিক বিশ্লেষক",
-      date: "২৮ মার্চ, ২০২৪"
-    }
-  ];
-
-  const photoGallery = [
-    { src: "/gallery/election-1.jpg", caption: "জনসভায় উপস্থিত ভোটারদের উদ্দেশ্যে বক্তব্য", date: "১৫ মার্চ" },
-    { src: "/gallery/election-2.jpg", caption: "নির্বাচনী ইশতেহার প্রকাশ অনুষ্ঠান", date: "১০ মার্চ" },
-    { src: "/gallery/election-3.jpg", caption: "যুব ভোটারদের সাথে সংলাপ", date: "৫ মার্চ" },
-    { src: "/gallery/election-4.jpg", caption: "স্থানীয় নেতাদের প্রশিক্ষণ", date: "২০ ফেব্রুয়ারি" }
+  // Regions for filter
+  const regions = [
+    'সব অঞ্চল',
+    'ঢাকা',
+    'চট্টগ্রাম',
+    'রংপুর',
+    'খুলনা',
+    'বরিশাল',
+    'সিলেট',
+    'ময়মনসিংহ',
+    'রাজশাহী'
   ];
 
   return (
-    <div className="min-h-screen py-12 px-4 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        {/* Newspaper Header */}
-        <div className="mb-8 text-center border-b-4 border-red-600 pb-6">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-4">
-            <div className="text-left">
-              <div className="text-sm text-gray-500">বৃহস্পতিবার, ৪ এপ্রিল ২০২৪</div>
-              <div className="text-sm text-gray-500">২১ চৈত্র ১৪৩০</div>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 font-serif my-4">
-              নির্বাচন সংবাদ
-            </h1>
-            <div className="text-right">
-              <div className="text-sm text-gray-500">প্রথম সংস্করণ</div>
-              <div className="text-sm text-gray-500">মূল্য: ২০ টাকা</div>
-            </div>
-          </div>
-          <div className="text-xl text-gray-700 max-w-3xl mx-auto">
-            বাংলাদেশের নির্বাচনী রাজনীতি, প্রার্থীদের কার্যক্রম ও ভোটারদের জন্য বিশেষ প্রতিবেদন
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Category Filter Pills */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category === 'সব' ? 'all' : category)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                (category === 'সব' && selectedCategory === 'all') || selectedCategory === category
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-white text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
         </div>
 
-        {/* Featured News Section - Newspaper Style */}
-        <div className="mb-12 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main News Section */}
           <div className="lg:col-span-2">
-            {featuredNews[0] && (
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300">
-                <div className="relative h-64 md:h-80">
-                  {/* Featured Image */}
-                  <div className="absolute inset-0 bg-gray-300 flex items-center justify-center">
-                    <div className="text-gray-500">ফিচার ছবি: {featuredNews[0].title}</div>
-                  </div>
-                  <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 bg-red-600 text-white text-sm font-bold rounded">
-                      বিশেষ প্রতিবেদন
-                    </span>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-red-600 font-bold">✪</span>
-                    <span className="text-sm text-gray-500">{featuredNews[0].date}</span>
-                    <span className="text-sm text-gray-500">•</span>
-                    <span className="text-sm text-gray-500">{featuredNews[0].readTime} পড়ার সময়</span>
-                  </div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 font-serif">
-                    {featuredNews[0].title}
-                  </h2>
-                  <p className="text-gray-700 mb-4 text-lg leading-relaxed">
-                    {featuredNews[0].summary}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <button className="text-red-700 font-bold hover:text-red-800 transition-colors">
-                      সম্পূর্ণ প্রতিবেদন পড়ুন →
-                    </button>
-                    <div className="text-sm text-gray-500">
-                      <span className="mr-4">👁️ ৪,৫০০+</span>
-                      <span>💬 ১২৩</span>
-                    </div>
-                  </div>
-                </div>
+            {/* Tab Navigation and Filters */}
+            <div className="bg-white rounded-xl shadow-lg p-2 mb-6 flex flex-wrap gap-2">
+              {['all', 'trending', 'latest', 'popular'].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
+                    activeTab === tab
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  {tab === 'all' && 'সব খবর'}
+                  {tab === 'trending' && 'ট্রেন্ডিং'}
+                  {tab === 'latest' && 'সর্বশেষ'}
+                  {tab === 'popular' && 'জনপ্রিয়'}
+                </button>
+              ))}
+              
+              <select
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
+                className="ml-auto px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-500 bg-white"
+              >
+                {regions.map((region) => (
+                  <option key={region} value={region === 'সব অঞ্চল' ? 'all' : region}>
+                    {region}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Loading State */}
+            {isLoading && visibleNews.length === 0 ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
               </div>
+            ) : (
+              <>
+                {/* News Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {visibleNews.map((news, index) => (
+                    <div
+                      key={news.id}
+                      className="group bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-500 animate-fadeIn cursor-pointer"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                      onClick={() => openNewsDetail(news)}
+                    >
+                      <div className="relative h-48 overflow-hidden">
+                        {news.image_url ? (
+                          <img
+                            src={news.image_url}
+                            alt={news.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center">
+                            <Newspaper className="h-12 w-12 text-gray-400" />
+                          </div>
+                        )}
+                        {news.trending && (
+                          <div className="absolute top-4 left-4 bg-gradient-to-r from-red-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1 shadow-lg">
+                            <Flame className="h-4 w-4" />
+                            ট্রেন্ডিং
+                          </div>
+                        )}
+                        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {new Date(news.published_at).toLocaleDateString('bn-BD', {
+                            hour: 'numeric',
+                            minute: 'numeric'
+                          })}
+                        </div>
+                      </div>
+                      
+                      <div className="p-6">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
+                            {news.category}
+                          </span>
+                          <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">
+                            {news.party}
+                          </span>
+                        </div>
+                        
+                        <h3 className="text-lg font-bold text-gray-800 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                          {news.title}
+                        </h3>
+                        
+                        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            {news.region}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Eye className="h-4 w-4" />
+                            {toBanglaNumber(news.views)} বার দেখা
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                          <div className="flex items-center gap-4">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleLike(news.id);
+                              }}
+                              className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
+                            >
+                              <ThumbsUp className="h-4 w-4" />
+                              <span>{toBanglaNumber(news.likes)}</span>
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openNewsDetail(news);
+                              }}
+                              className="flex items-center gap-1 text-gray-500 hover:text-green-600 transition-colors"
+                            >
+                              <MessageCircle className="h-4 w-4" />
+                              <span>{toBanglaNumber(news.comments)}</span>
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={(e) => e.stopPropagation()}
+                              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                            >
+                              <Share2 className="h-4 w-4 text-gray-500" />
+                            </button>
+                            <button 
+                              onClick={(e) => e.stopPropagation()}
+                              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                            >
+                              <Bookmark className="h-4 w-4 text-gray-500" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* No Results */}
+                {visibleNews.length === 0 && !isLoading && (
+                  <div className="text-center py-12 bg-white rounded-2xl">
+                    <Newspaper className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-700 mb-2">কোনো খবর পাওয়া যায়নি</h3>
+                    <p className="text-gray-500">অনুগ্রহ করে অন্য কিওয়ার্ড দিয়ে খুঁজুন</p>
+                  </div>
+                )}
+
+                {/* Load More Button */}
+                {hasMore && visibleNews.length > 0 && (
+                  <div className="text-center mt-8">
+                    <button
+                      onClick={loadMoreNews}
+                      disabled={isLoading}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isLoading ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                          লোড হচ্ছে...
+                        </div>
+                      ) : (
+                        'আরো খবর দেখুন'
+                      )}
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
-          {/* Side Column - Second Featured News */}
-          <div>
-            {featuredNews[1] && (
-              <div className="bg-white rounded-lg shadow-md border border-gray-300 h-full">
-                <div className="relative h-40">
-                  <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-                    <div className="text-gray-500">ছবি: {featuredNews[1].title}</div>
+          {/* Sidebar */}
+          <div className="space-y-8">
+            {/* Poll Section */}
+            {pollData.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-6 transform hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
+                    <PieChart className="h-5 w-5 text-white" />
                   </div>
-                  <div className="absolute top-2 left-2">
-                    <span className="px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded">
-                      পরিসংখ্যান
+                  <h3 className="text-xl font-bold text-gray-800">জরিপ ফলাফল</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  {pollData.map((item, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-sm font-medium text-gray-700">{item.party}</span>
+                        <span className="text-sm font-bold text-gray-900">{toBanglaNumber(item.percentage)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                        <div
+                          className={`bg-gradient-to-r ${item.color_from} ${item.color_to} h-2.5 rounded-full transition-all duration-1000 ease-out`}
+                          style={{ width: `${item.percentage}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <button className="mt-6 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300">
+                  বিস্তারিত দেখুন
+                </button>
+              </div>
+            )}
+
+            {/* Trending Topics */}
+            {trendingTopics.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="bg-gradient-to-r from-orange-500 to-red-500 p-2 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800">ট্রেন্ডিং টপিক</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  {trendingTopics.map((topic, index) => (
+                    <div
+                      key={topic.id}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer group"
+                    >
+                      <div>
+                        <p className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+                          {topic.topic}
+                        </p>
+                        <p className="text-sm text-gray-500">{formatBanglaNumber(topic.posts)} পোস্ট</p>
+                      </div>
+                      <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Upcoming Events */}
+            {upcomingEvents.length > 0 && (
+              <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
+                <div className="flex items-center gap-2 mb-4">
+                  <Calendar className="h-6 w-6" />
+                  <h3 className="text-xl font-bold">আসন্ন ইভেন্ট</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  {upcomingEvents.map((event) => (
+                    <div key={event.id} className="bg-white/10 backdrop-blur-lg rounded-xl p-4">
+                      <p className="text-sm opacity-90">
+                        {new Date(event.event_date).toLocaleDateString('bn-BD', {
+                          day: 'numeric',
+                          month: 'long'
+                        })}
+                      </p>
+                      <p className="font-semibold">{event.title}</p>
+                      <p className="text-sm opacity-75 mt-1">{event.location}</p>
+                      {event.party && (
+                        <span className="inline-block mt-2 text-xs bg-white/20 px-2 py-1 rounded-full">
+                          {event.party}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                <button className="mt-6 w-full bg-white text-blue-600 py-3 rounded-xl font-semibold hover:bg-gray-100 transform hover:scale-105 transition-all duration-300">
+                  সব ইভেন্ট দেখুন
+                </button>
+              </div>
+            )}
+
+            {/* Newsletter */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-3">আপডেট পেতে সাবস্ক্রাইব করুন</h3>
+              <p className="text-gray-600 mb-4">প্রতিদিনের নির্বাচনী খবর সরাসরি আপনার ইনবক্সে</p>
+              
+              <div className="space-y-3">
+                <input
+                  type="email"
+                  placeholder="আপনার ইমেইল"
+                  value={subscribeEmail}
+                  onChange={(e) => setSubscribeEmail(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+                />
+                <button
+                  onClick={() => setShowSubscribeModal(true)}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300"
+                >
+                  সাবস্ক্রাইব
+                </button>
+              </div>
+            </div>
+
+            {/* Important Links */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">গুরুত্বপূর্ণ লিংক</h3>
+              <div className="space-y-2">
+                <a href="#" className="block p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                  <div className="font-semibold">নির্বাচন কমিশন</div>
+                  <div className="text-sm text-gray-500">সরকারি ওয়েবসাইট</div>
+                </a>
+                <a href="#" className="block p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                  <div className="font-semibold">ভোটার তথ্য</div>
+                  <div className="text-sm text-gray-500">ভোটার তালিকা চেক করুন</div>
+                </a>
+                <a href="#" className="block p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                  <div className="font-semibold">প্রার্থী তালিকা</div>
+                  <div className="text-sm text-gray-500">সব দলের প্রার্থীগণ</div>
+                </a>
+                <a href="#" className="block p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                  <div className="font-semibold">ফলাফল ২০১৮</div>
+                  <div className="text-sm text-gray-500">পূর্ববর্তী নির্বাচনের ফলাফল</div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Subscribe Modal */}
+      {showSubscribeModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold">নিউজলেটার সাবস্ক্রিপশন</h3>
+                <button
+                  onClick={() => {
+                    setShowSubscribeModal(false);
+                    setSubscribeMessage('');
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-lg"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubscribe}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    ইমেইল ঠিকানা
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={subscribeEmail}
+                    onChange={(e) => setSubscribeEmail(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                    placeholder="your@email.com"
+                  />
+                </div>
+
+                {subscribeMessage && (
+                  <div className={`mb-4 p-3 rounded-lg ${
+                    subscribeMessage.includes('সফল') 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-red-100 text-red-700'
+                  }`}>
+                    {subscribeMessage}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={subscribeLoading}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50"
+                >
+                  {subscribeLoading ? 'সাবস্ক্রাইব হচ্ছে...' : 'সাবস্ক্রাইব'}
+                </button>
+              </form>
+
+              <p className="text-xs text-gray-500 mt-4 text-center">
+                সাবস্ক্রাইব করে আপনি আমাদের প্রাইভেসি পলিসি এবং টার্মস অফ সার্ভিসে সম্মতি দিচ্ছেন
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* News Detail Modal */}
+      {showDetailModal && selectedNews && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header with Image */}
+            <div className="relative h-64 overflow-hidden rounded-t-2xl">
+              {selectedNews.image_url ? (
+                <img
+                  src={selectedNews.image_url}
+                  alt={selectedNews.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-r from-blue-900 to-purple-900 flex items-center justify-center">
+                  <Newspaper className="h-16 w-16 text-white/30" />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+              
+              {/* Close Button */}
+              <button
+                onClick={closeNewsDetail}
+                className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-lg transition-colors backdrop-blur-sm"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              {/* Content Overlay */}
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span className="bg-blue-600 px-3 py-1 rounded-full text-sm font-semibold">
+                    {selectedNews.category}
+                  </span>
+                  <span className="bg-purple-600 px-3 py-1 rounded-full text-sm font-semibold">
+                    {selectedNews.party}
+                  </span>
+                  {selectedNews.trending && (
+                    <span className="bg-gradient-to-r from-red-500 to-orange-500 px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                      <Flame className="h-3 w-3" />
+                      ট্রেন্ডিং
                     </span>
+                  )}
+                </div>
+
+                <h2 className="text-2xl font-bold mb-2">{selectedNews.title}</h2>
+
+                <div className="flex flex-wrap items-center gap-4 text-sm text-white/80">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    {formatBanglaDate(selectedNews.published_at)}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" />
+                    {selectedNews.region}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Eye className="h-4 w-4" />
+                    {toBanglaNumber(selectedNews.views)} বার দেখা
                   </div>
                 </div>
-                <div className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm text-gray-500">{featuredNews[1].date}</span>
-                    <span className="text-sm text-gray-500">•</span>
-                    <span className="text-sm text-gray-500">{featuredNews[1].readTime}</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 font-serif">
-                    {featuredNews[1].title}
-                  </h3>
-                  <p className="text-gray-600 mb-4 text-sm">
-                    {featuredNews[1].summary}
-                  </p>
-                  <button className="text-blue-700 font-semibold hover:text-blue-800 transition-colors text-sm">
-                    বিস্তারিত →
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6">
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleLike(selectedNews.id)}
+                    disabled={liked}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+                      liked
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <ThumbsUp className={`h-4 w-4 ${liked ? 'fill-current' : ''}`} />
+                    {liked ? 'লাইক দেওয়া হয়েছে' : 'লাইক দিন'} ({toBanglaNumber(selectedNews.likes)})
+                  </button>
+
+                  <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors">
+                    <MessageCircle className="h-4 w-4" />
+                    মন্তব্য ({toBanglaNumber(selectedNews.comments)})
                   </button>
                 </div>
-              </div>
-            )}
 
-            {/* Quick Stats */}
-            <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-300 p-4">
-              <h3 className="font-bold text-gray-900 mb-3 border-b pb-2">দ্রুত পরিসংখ্যান</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">নতুন ভোটার</span>
-                  <span className="font-bold">২৫,০০০+</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">জনসভা</span>
-                  <span className="font-bold">৫০+</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">মিডিয়া কভারেজ</span>
-                  <span className="font-bold">১০০+</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setBookmarked(!bookmarked)}
+                    className={`p-2 rounded-lg transition-colors ${
+                      bookmarked ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Bookmark className={`h-5 w-5 ${bookmarked ? 'fill-current' : ''}`} />
+                  </button>
 
-        {/* News Categories - Newspaper Columns */}
-        <div className="mb-12">
-          <div className="flex items-center gap-4 mb-6 border-b-2 border-gray-300 pb-2">
-            <h2 className="text-2xl font-bold text-gray-900 font-serif">সর্বশেষ সংবাদ</h2>
-            <div className="flex-1 h-px bg-gray-300"></div>
-          </div>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowShareMenu(!showShareMenu)}
+                      className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      <Share2 className="h-5 w-5" />
+                    </button>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Main News Column */}
-            <div>
-              {electionCategories.map((category, categoryIndex) => (
-                <div key={categoryIndex} className="mb-8">
-                  <div className="flex items-center gap-3 mb-4">
-                    <h3 className="text-xl font-bold text-gray-900 bg-red-50 px-4 py-2 rounded-lg">
-                      {category.category}
-                    </h3>
-                    <div className="flex-1 h-px bg-gray-300"></div>
+                    {showShareMenu && (
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl z-50 p-2">
+                        <p className="text-sm font-medium text-gray-700 mb-2 px-2">শেয়ার করুন</p>
+                        <div className="space-y-1">
+                          <button
+                            onClick={() => handleShare('facebook')}
+                            className="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
+                            <Facebook className="h-5 w-5 text-blue-600" />
+                            <span>Facebook</span>
+                          </button>
+                          <button
+                            onClick={() => handleShare('twitter')}
+                            className="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
+                            <Twitter className="h-5 w-5 text-sky-500" />
+                            <span>Twitter</span>
+                          </button>
+                          <button
+                            onClick={() => handleShare('linkedin')}
+                            className="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
+                            <Linkedin className="h-5 w-5 text-blue-700" />
+                            <span>LinkedIn</span>
+                          </button>
+                          <button
+                            onClick={handleCopyLink}
+                            className="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
+                            <LinkIcon className="h-5 w-5 text-gray-600" />
+                            <span>লিংক কপি করুন</span>
+                          </button>
+                          {copySuccess && (
+                            <div className="mt-2 px-3 py-2 bg-green-100 text-green-700 text-sm rounded-lg flex items-center gap-2">
+                              <Check className="h-4 w-4" />
+                              {copySuccess}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
+                </div>
+              </div>
 
-                  <div className="space-y-6">
-                    {category.news.map((news, newsIndex) => (
-                      <div key={newsIndex} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300">
-                        <div className="p-4">
-                          <div className="flex flex-col md:flex-row gap-4">
-                            <div className="md:w-1/3">
-                              <div className="relative h-40 md:h-32 rounded overflow-hidden bg-gray-200">
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                  <div className="text-gray-500 text-sm">ছবি: {news.title.substring(0, 20)}...</div>
-                                </div>
-                                {news.featured && (
-                                  <div className="absolute top-2 left-2">
-                                    <span className="px-2 py-1 bg-red-600 text-white text-xs font-bold rounded">
-                                      বিশেষ
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            <div className="md:w-2/3">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-xs text-gray-500">{news.date}</span>
-                                <span className="text-xs text-gray-500">•</span>
-                                <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                                  {news.type}
-                                </span>
-                              </div>
-                              <h4 className="text-lg font-bold text-gray-900 mb-2 font-serif">
-                                {news.title}
-                              </h4>
-                              <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                                {news.description}
-                              </p>
-                              <div className="flex items-center justify-between">
-                                <div className="text-xs text-gray-500">
-                                  <span className="mr-3">✍️ {news.author}</span>
-                                  <span>👁️ {news.views}</span>
-                                </div>
-                                <button className="text-red-700 font-semibold hover:text-red-800 transition-colors text-sm">
-                                  পড়ুন →
-                                </button>
-                              </div>
-                            </div>
+              {/* News Content */}
+              <div className="prose prose-lg max-w-none mb-8">
+                {selectedNews.content ? (
+                  <div dangerouslySetInnerHTML={{ __html: selectedNews.content.replace(/\n/g, '<br />') }} />
+                ) : (
+                  <p className="text-gray-600 italic">কোনো বিস্তারিত তথ্য পাওয়া যায়নি।</p>
+                )}
+              </div>
+
+              {/* Tags */}
+              <div className="mb-8 pb-6 border-b border-gray-200">
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-gray-600 font-medium">ট্যাগস:</span>
+                  <span className="bg-gray-100 px-3 py-1 rounded-full text-sm">#{selectedNews.category}</span>
+                  <span className="bg-gray-100 px-3 py-1 rounded-full text-sm">#{selectedNews.party}</span>
+                  <span className="bg-gray-100 px-3 py-1 rounded-full text-sm">#{selectedNews.region}</span>
+                  {selectedNews.trending && (
+                    <span className="bg-gray-100 px-3 py-1 rounded-full text-sm">#ট্রেন্ডিং</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Related News */}
+              {relatedNews.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">সম্পর্কিত খবর</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {relatedNews.map((item) => (
+                      <div
+                        key={item.id}
+                        className="group cursor-pointer"
+                        onClick={() => {
+                          openNewsDetail(item);
+                        }}
+                      >
+                        {item.image_url ? (
+                          <img
+                            src={item.image_url}
+                            alt={item.title}
+                            className="w-full h-32 object-cover rounded-lg mb-2"
+                          />
+                        ) : (
+                          <div className="w-full h-32 bg-gray-200 rounded-lg flex items-center justify-center mb-2">
+                            <Newspaper className="h-8 w-8 text-gray-400" />
                           </div>
+                        )}
+                        <h4 className="font-semibold text-gray-800 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                          {item.title}
+                        </h4>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <Eye className="h-3 w-3" />
+                            {toBanglaNumber(item.views)}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <ThumbsUp className="h-3 w-3" />
+                            {toBanglaNumber(item.likes)}
+                          </span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {/* Side Column - Newspaper Style */}
-            <div className="space-y-8">
-              {/* Editorial Column */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-300 p-6">
-                <div className="border-l-4 border-red-600 pl-4 mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 font-serif">সম্পাদকীয়</h3>
-                </div>
-                {newspaperColumns.map((column, index) => (
-                  <div key={index} className="mb-6 last:mb-0">
-                    <h4 className="font-bold text-gray-900 mb-2">{column.title}</h4>
-                    <p className="text-gray-700 mb-3 leading-relaxed text-justify">
-                      {column.content}
-                    </p>
-                    <div className="text-right text-sm text-gray-500">
-                      - {column.author}, {column.date}
-                    </div>
-                    {index < newspaperColumns.length - 1 && (
-                      <div className="my-4 h-px bg-gray-200"></div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Photo Gallery */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-300 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 font-serif">ছবি গ্যালারি</h3>
-                  <button className="text-red-700 text-sm font-semibold hover:text-red-800">
-                    সব ছবি দেখুন →
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {photoGallery.map((photo, index) => (
-                    <div key={index} className="relative rounded overflow-hidden group cursor-pointer">
-                      <div className="aspect-square bg-gray-200 flex items-center justify-center">
-                        <div className="text-gray-500 text-xs text-center px-2">
-                          ছবি: {photo.caption.substring(0, 15)}...
-                        </div>
-                      </div>
-                      <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                        <div className="p-2 text-white text-xs">
-                          <div>{photo.caption}</div>
-                          <div className="text-gray-300">{photo.date}</div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Upcoming Events */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-300 p-6">
-                <h3 className="text-xl font-bold text-gray-900 font-serif mb-4">আসন্ন অনুষ্ঠান</h3>
-                <div className="space-y-4">
-                  {upcomingElectionEvents.map((event, index) => (
-                    <div key={index} className="border-l-2 border-blue-500 pl-4">
-                      <div className="flex items-start gap-3">
-                        <div className="w-12 h-12 bg-blue-100 rounded flex items-center justify-center flex-shrink-0">
-                          <span className="text-blue-600 font-bold">📅</span>
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-gray-900 mb-1">{event.event}</h4>
-                          <p className="text-gray-600 text-sm mb-2">{event.description}</p>
-                          <div className="text-xs text-gray-500 space-y-1">
-                            <div>📌 {event.location}</div>
-                            <div>⏰ {event.date}, {event.time}</div>
-                          </div>
-                        </div>
-                      </div>
-                      {index < upcomingElectionEvents.length - 1 && (
-                        <div className="my-4 h-px bg-gray-200"></div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
+      )}
 
-        {/* Newspaper Footer */}
-        <div className="mt-12 pt-8 border-t-4 border-red-600">
-          <div className="text-center text-gray-600 text-sm">
-            <p>প্রকাশক: নির্বাচন সংবাদ ডেস্ক | সম্পাদক: রাজনৈতিক সম্পাদক</p>
-            <p className="mt-2">ঠিকানা: নরসিংদী, ঢাকা | ইমেইল: election@khaledjewel.com | ফোন: ০১৭XX-XXXXXX</p>
-            <p className="mt-2">© ২০২৪ নির্বাচন সংবাদ | সকল অধিকার সংরক্ষিত</p>
-          </div>
-        </div>
-
-        {/* Back Button */}
-        <div className="mt-12 text-center">
-          <a 
-            href="/news"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white border-2 border-red-600 text-red-700 font-semibold rounded-lg hover:bg-red-50 transition-all duration-300 shadow-sm"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            সংবাদ পেইজে ফিরে যান
-          </a>
-        </div>
-      </div>
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.6s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
-}
+};
+
+export default ElectionNewsPage;
