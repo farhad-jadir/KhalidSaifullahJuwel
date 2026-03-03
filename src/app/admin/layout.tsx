@@ -1,3 +1,4 @@
+//app/admin/layout.tsx
 'use client'
 
 import { ReactNode, useState, useRef, ChangeEvent } from 'react'
@@ -154,6 +155,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     onClick={closeMenu}
                   >
                     নির্বাচন
+                  </Link>
+                  <Link 
+                    href="/admin/activities/political" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    onClick={closeMenu}
+                  >
+                    রাজনৈতিক কার্যক্রম
                   </Link>
                 </div>
               </>
