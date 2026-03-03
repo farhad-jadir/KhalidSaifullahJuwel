@@ -226,10 +226,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-200 text-gray-700 p-4 text-center">
-        &copy; {new Date().getFullYear()} Your Company
-      </footer>
+     
     </div>
   )
 }
