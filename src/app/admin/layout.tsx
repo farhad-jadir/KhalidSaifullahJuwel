@@ -163,6 +163,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   >
                     রাজনৈতিক কার্যক্রম
                   </Link>
+                   <Link 
+                    href="/admin/activities/social" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    onClick={closeMenu}
+                  >
+                    সামাজিক কার্যক্রম
+                  </Link>
                 </div>
               </>
             )}

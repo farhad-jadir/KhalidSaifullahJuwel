@@ -1,3 +1,4 @@
+//khalid/src/app/activities/creative/page.tsx
 import { Calendar } from "lucide-react";
 
 export default function CreativeActivitiesPage() {
