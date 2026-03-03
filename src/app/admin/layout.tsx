@@ -170,6 +170,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   >
                     সামাজিক কার্যক্রম
                   </Link>
+                  <Link 
+                    href="/admin/activities/creative" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    onClick={closeMenu}
+                  >
+                    সৃজনশীল কার্যক্রম
+                  </Link>
+                  <Link 
+                    href="/admin/activities/development" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    onClick={closeMenu}
+                  >
+                    উন্নয়নমূলক কার্যক্রম
+                  </Link>
                 </div>
               </>
             )}

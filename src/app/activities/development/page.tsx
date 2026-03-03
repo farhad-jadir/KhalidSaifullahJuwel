@@ -1,3 +1,4 @@
+//khalid/src/app/activiities/development/page/tsx
 import { Building, Lightbulb, School, Hospital, Droplets } from "lucide-react";
 
 export default function DevelopmentActivitiesPage() {
