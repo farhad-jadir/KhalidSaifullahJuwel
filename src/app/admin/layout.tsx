@@ -198,6 +198,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   >
                    যোগাযোগ
                   </Link>
+                  <Link 
+                    href="/admin/partnerships" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    onClick={closeMenu}
+                  >
+                   পার্টনারশিপ
+                  </Link>
                 </div>
               </>
             )}
