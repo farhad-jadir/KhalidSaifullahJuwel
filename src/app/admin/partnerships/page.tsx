@@ -11,7 +11,7 @@ import {
   Edit, Trash2, Plus, Save, X, ChevronDown, ChevronUp,
   Star, Award, Heart, BookOpen, Video, Newspaper,
   Filter, Search, RefreshCw, Upload, Link as LinkIcon,
-  Twitter, Facebook, Linkedin, Instagram, Youtube
+  Twitter, Facebook, Linkedin, Instagram, Youtube, Menu
 } from 'lucide-react';
 
 const supabase = createClient(
@@ -84,12 +84,13 @@ export default function AdminPartnershipsPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<'categories' | 'partnerships' | 'collaboration' | 'stats'>('partnerships');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // Data states
   const [categories, setCategories] = useState<PartnershipCategory[]>([]);
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
   const [collaborationTypes, setCollaborationTypes] = useState<CollaborationType[]>([]);
-  const [stats, setStats] = useState<PartnershipStat[]>([]); // ← এইটা স্টেট
+  const [stats, setStats] = useState<PartnershipStat[]>([]);
   
   // Modal states
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -106,6 +107,7 @@ export default function AdminPartnershipsPage() {
   // Filters
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
   
   // ========== ফর্ম স্টেট ==========
   const [categoryForm, setCategoryForm] = useState<Partial<PartnershipCategory>>({
@@ -204,7 +206,7 @@ export default function AdminPartnershipsPage() {
         .from('partnership_stats')
         .select('*')
         .order('sort_order');
-      setStats(statsData || []); // ← স্টেট আপডেট
+      setStats(statsData || []);
 
     } catch (error) {
       console.error('Load error:', error);
@@ -545,7 +547,6 @@ export default function AdminPartnershipsPage() {
     return true;
   });
 
-  // নাম পরিবর্তন করে partnershipStats করা হলো (stats এর সাথে কনফ্লিক্ট এড়াতে)
   const partnershipStats = {
     total: partnerships.length,
     featured: partnerships.filter(p => p.is_featured).length,
@@ -554,10 +555,10 @@ export default function AdminPartnershipsPage() {
 
   if (!isAuthenticated || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600">লোড হচ্ছে...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-sm sm:text-base">লোড হচ্ছে...</p>
         </div>
       </div>
     );
@@ -567,29 +568,57 @@ export default function AdminPartnershipsPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          {/* Mobile Header with Menu Button */}
+          <div className="flex items-center justify-between lg:hidden mb-4">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+              পার্টনারশিপ
+            </h1>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 hover:bg-gray-100 rounded-lg"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Desktop Title */}
+          <h1 className="hidden lg:block text-2xl font-bold text-gray-900 mb-4">
             পার্টনারশিপ ব্যবস্থাপনা
           </h1>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mb-4">
-            <div className="bg-blue-50 rounded-lg p-4">
-              <p className="text-sm text-blue-600">মোট পার্টনার</p>
-              <p className="text-2xl font-bold text-blue-700">{partnershipStats.total}</p>
+          {/* Stats - Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
+            <div className="bg-blue-50 rounded-lg p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-blue-600">মোট পার্টনার</p>
+              <p className="text-xl sm:text-2xl font-bold text-blue-700">{partnershipStats.total}</p>
             </div>
-            <div className="bg-green-50 rounded-lg p-4">
-              <p className="text-sm text-green-600">সক্রিয়</p>
-              <p className="text-2xl font-bold text-green-700">{partnershipStats.active}</p>
+            <div className="bg-green-50 rounded-lg p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-green-600">সক্রিয়</p>
+              <p className="text-xl sm:text-2xl font-bold text-green-700">{partnershipStats.active}</p>
             </div>
-            <div className="bg-yellow-50 rounded-lg p-4">
-              <p className="text-sm text-yellow-600">ফিচার্ড</p>
-              <p className="text-2xl font-bold text-yellow-700">{partnershipStats.featured}</p>
+            <div className="bg-yellow-50 rounded-lg p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-yellow-600">ফিচার্ড</p>
+              <p className="text-xl sm:text-2xl font-bold text-yellow-700">{partnershipStats.featured}</p>
             </div>
           </div>
 
-          {/* Tabs */}
-          <div className="flex flex-wrap gap-2 border-b">
+          {/* Tabs - Mobile Dropdown / Desktop Tabs */}
+          <div className="lg:hidden">
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value as any)}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              <option value="partnerships">পার্টনার সমূহ</option>
+              <option value="categories">ক্যাটাগরি</option>
+              <option value="collaboration">সহযোগিতার ধরন</option>
+              <option value="stats">পরিসংখ্যান</option>
+            </select>
+          </div>
+
+          {/* Desktop Tabs */}
+          <div className="hidden lg:flex flex-wrap gap-2 border-b">
             <button
               onClick={() => setActiveTab('partnerships')}
               className={`px-4 py-2 flex items-center gap-2 transition-colors ${
@@ -639,119 +668,219 @@ export default function AdminPartnershipsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Partnerships Tab */}
         {activeTab === 'partnerships' && (
-          <div className="space-y-6">
-            {/* Filters */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex gap-4">
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+          <div className="space-y-4 sm:space-y-6">
+            {/* Filters - Responsive */}
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              {/* Mobile Filter Toggle */}
+              <div className="flex items-center justify-between sm:hidden mb-4">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-2 text-gray-600"
                 >
-                  <option value="all">সব ক্যাটাগরি</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="খুঁজুন..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+                  <Filter className="w-4 h-4" />
+                  ফিল্টার
+                  {showFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
                 <button
                   onClick={() => {
                     resetPartnershipForm();
                     setEditingPartnership(null);
                     setShowPartnershipModal(true);
                   }}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                  className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm"
                 >
                   <Plus className="w-4 h-4" />
-                  নতুন পার্টনার
+                  নতুন
                 </button>
+              </div>
+
+              {/* Filter Content */}
+              <div className={`${showFilters ? 'block' : 'hidden'} sm:block`}>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="w-full sm:w-auto px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  >
+                    <option value="all">সব ক্যাটাগরি</option>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                  </select>
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="খুঁজুন..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-9 sm:pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                  {/* Desktop Add Button */}
+                  <button
+                    onClick={() => {
+                      resetPartnershipForm();
+                      setEditingPartnership(null);
+                      setShowPartnershipModal(true);
+                    }}
+                    className="hidden sm:flex bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    নতুন পার্টনার
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Partnerships List */}
+            {/* Partnerships List - Responsive Cards */}
             <div className="bg-white rounded-lg shadow">
               {filteredPartnerships.length === 0 ? (
-                <div className="p-12 text-center">
-                  <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">কোনো পার্টনার পাওয়া যায়নি</p>
+                <div className="p-8 sm:p-12 text-center">
+                  <Users className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 text-sm sm:text-base">কোনো পার্টনার পাওয়া যায়নি</p>
                 </div>
               ) : (
                 <div className="divide-y">
                   {filteredPartnerships.map((partner) => (
-                    <div key={partner.id} className="p-6 hover:bg-gray-50">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-4">
+                    <div key={partner.id} className="p-4 sm:p-6 hover:bg-gray-50">
+                      {/* Mobile View */}
+                      <div className="block sm:hidden">
+                        <div className="flex items-start gap-3 mb-3">
                           {partner.image_url ? (
-                            <div className="w-16 h-16 rounded-lg overflow-hidden">
+                            <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                               <Image
                                 src={partner.image_url}
                                 alt={partner.name}
-                                width={64}
-                                height={64}
+                                width={48}
+                                height={48}
                                 className="object-cover"
                               />
                             </div>
                           ) : (
-                            <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center text-3xl">
+                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                               {partner.logo}
                             </div>
                           )}
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-semibold text-lg">{partner.name}</h3>
-                              {partner.is_featured && (
-                                <span className="text-yellow-500">★</span>
-                              )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <h3 className="font-semibold text-base truncate">{partner.name}</h3>
+                                <p className="text-xs text-blue-600 truncate">{partner.type}</p>
+                              </div>
+                              <div className="flex gap-1 flex-shrink-0">
+                                <button
+                                  onClick={() => {
+                                    setEditingPartnership(partner);
+                                    setPartnershipForm(partner);
+                                    setShowPartnershipModal(true);
+                                  }}
+                                  className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"
+                                >
+                                  <Edit className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => deletePartnership(partner.id, partner.image_path)}
+                                  className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </div>
-                            <p className="text-sm text-blue-600">{partner.type}</p>
-                            <p className="text-sm text-gray-500 mt-1">
-                              {getCategoryName(partner.category_id)} • সহযোগিতা: {partner.since}
-                            </p>
                           </div>
                         </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => {
-                              setEditingPartnership(partner);
-                              setPartnershipForm(partner);
-                              setShowPartnershipModal(true);
-                            }}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => deletePartnership(partner.id, partner.image_path)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                        <p className="text-gray-600 text-xs mb-2 line-clamp-2">{partner.description}</p>
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          <span className="text-gray-500">{getCategoryName(partner.category_id)}</span>
+                          <span className="text-gray-300">•</span>
+                          <span className="text-gray-500">সহ: {partner.since}</span>
+                          {partner.is_featured && (
+                            <>
+                              <span className="text-gray-300">•</span>
+                              <span className="text-yellow-500">★ ফিচার্ড</span>
+                            </>
+                          )}
                         </div>
+                        {partner.website && (
+                          <a
+                            href={partner.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-2 text-blue-600 text-xs hover:underline flex items-center gap-1"
+                          >
+                            <Globe className="w-3 h-3" />
+                            ওয়েবসাইট
+                          </a>
+                        )}
                       </div>
-                      <p className="text-gray-600 text-sm mb-3">{partner.description}</p>
-                      {partner.website && (
-                        <a
-                          href={partner.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 text-sm hover:underline flex items-center gap-1"
-                        >
-                          <Globe className="w-4 h-4" />
-                          ওয়েবসাইট
-                        </a>
-                      )}
+
+                      {/* Desktop/Tablet View */}
+                      <div className="hidden sm:block">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-4">
+                            {partner.image_url ? (
+                              <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                <Image
+                                  src={partner.image_url}
+                                  alt={partner.name}
+                                  width={64}
+                                  height={64}
+                                  className="object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center text-3xl flex-shrink-0">
+                                {partner.logo}
+                              </div>
+                            )}
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-semibold text-lg">{partner.name}</h3>
+                                {partner.is_featured && (
+                                  <span className="text-yellow-500">★</span>
+                                )}
+                              </div>
+                              <p className="text-sm text-blue-600">{partner.type}</p>
+                              <p className="text-sm text-gray-500 mt-1">
+                                {getCategoryName(partner.category_id)} • সহযোগিতা: {partner.since}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setEditingPartnership(partner);
+                                setPartnershipForm(partner);
+                                setShowPartnershipModal(true);
+                              }}
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => deletePartnership(partner.id, partner.image_path)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                        <p className="text-gray-600 text-sm mb-3">{partner.description}</p>
+                        {partner.website && (
+                          <a
+                            href={partner.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 text-sm hover:underline flex items-center gap-1"
+                          >
+                            <Globe className="w-4 h-4" />
+                            ওয়েবসাইট
+                          </a>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -760,50 +889,50 @@ export default function AdminPartnershipsPage() {
           </div>
         )}
 
-        {/* Categories Tab */}
+        {/* Categories Tab - Responsive */}
         {activeTab === 'categories' && (
           <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b flex justify-between items-center">
-              <h2 className="text-xl font-bold">ক্যাটাগরি</h2>
+            <div className="p-4 sm:p-6 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <h2 className="text-lg sm:text-xl font-bold">ক্যাটাগরি</h2>
               <button
                 onClick={() => {
                   resetCategoryForm();
                   setEditingCategory(null);
                   setShowCategoryModal(true);
                 }}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 text-sm"
               >
                 <Plus className="w-4 h-4" />
                 নতুন ক্যাটাগরি
               </button>
             </div>
-            <div className="p-6">
-              <div className="grid gap-4">
+            <div className="p-4 sm:p-6">
+              <div className="grid gap-3 sm:gap-4">
                 {categories.map((cat) => (
-                  <div key={cat.id} className="border rounded-lg p-4 flex items-center justify-between">
+                  <div key={cat.id} className="border rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">{cat.icon}</span>
-                      <div>
-                        <h3 className="font-semibold">{cat.name}</h3>
-                        <p className="text-sm text-gray-500">{cat.description}</p>
+                      <span className="text-2xl sm:text-3xl">{cat.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm sm:text-base truncate">{cat.name}</h3>
+                        <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">{cat.description}</p>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 sm:self-center justify-end">
                       <button
                         onClick={() => {
                           setEditingCategory(cat);
                           setCategoryForm(cat);
                           setShowCategoryModal(true);
                         }}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                        className="p-1.5 sm:p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </button>
                       <button
                         onClick={() => deleteCategory(cat.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                        className="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </button>
                     </div>
                   </div>
@@ -813,46 +942,46 @@ export default function AdminPartnershipsPage() {
           </div>
         )}
 
-        {/* Collaboration Types Tab */}
+        {/* Collaboration Types Tab - Responsive */}
         {activeTab === 'collaboration' && (
           <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b flex justify-between items-center">
-              <h2 className="text-xl font-bold">সহযোগিতার ধরন</h2>
+            <div className="p-4 sm:p-6 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <h2 className="text-lg sm:text-xl font-bold">সহযোগিতার ধরন</h2>
               <button
                 onClick={() => {
                   resetCollaborationForm();
                   setEditingCollaboration(null);
                   setShowCollaborationModal(true);
                 }}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 text-sm"
               >
                 <Plus className="w-4 h-4" />
                 নতুন ধরন
               </button>
             </div>
-            <div className="p-6">
-              <div className="flex flex-wrap gap-3">
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 {collaborationTypes.map((type) => (
                   <div
                     key={type.id}
-                    className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${type.color}`}
+                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 ${type.color}`}
                   >
-                    <span>{type.name} • {type.count}</span>
+                    <span className="truncate max-w-[120px] sm:max-w-none">{type.name} • {type.count}</span>
                     <button
                       onClick={() => {
                         setEditingCollaboration(type);
                         setCollaborationForm(type);
                         setShowCollaborationModal(true);
                       }}
-                      className="ml-2 hover:opacity-70"
+                      className="ml-1 hover:opacity-70"
                     >
-                      <Edit className="w-3 h-3" />
+                      <Edit className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                     </button>
                     <button
                       onClick={() => deleteCollaboration(type.id)}
                       className="hover:opacity-70"
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                     </button>
                   </div>
                 ))}
@@ -861,34 +990,34 @@ export default function AdminPartnershipsPage() {
           </div>
         )}
 
-        {/* Stats Tab */}
+        {/* Stats Tab - Responsive */}
         {activeTab === 'stats' && (
           <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b flex justify-between items-center">
-              <h2 className="text-xl font-bold">পরিসংখ্যান</h2>
+            <div className="p-4 sm:p-6 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <h2 className="text-lg sm:text-xl font-bold">পরিসংখ্যান</h2>
               <button
                 onClick={() => {
                   resetStatForm();
                   setEditingStat(null);
                   setShowStatModal(true);
                 }}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 text-sm"
               >
                 <Plus className="w-4 h-4" />
                 নতুন পরিসংখ্যান
               </button>
             </div>
-            <div className="p-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-4 sm:p-6">
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {stats.map((stat) => (
-                  <div key={stat.id} className="bg-white border rounded-lg p-6 text-center relative group">
-                    <div className="text-3xl mb-2">{stat.icon}</div>
-                    <div className="text-2xl font-bold text-blue-600 mb-1">{stat.value}</div>
-                    <div className="text-sm text-gray-600">{stat.label}</div>
+                  <div key={stat.id} className="bg-white border rounded-lg p-4 sm:p-6 text-center relative group hover:shadow-md transition-shadow">
+                    <div className="text-2xl sm:text-3xl mb-2">{stat.icon}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">{stat.value}</div>
+                    <div className="text-xs sm:text-sm text-gray-600">{stat.label}</div>
                     {stat.description && (
-                      <div className="text-xs text-gray-400 mt-1">{stat.description}</div>
+                      <div className="text-xs text-gray-400 mt-1 hidden sm:block">{stat.description}</div>
                     )}
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex">
                       <button
                         onClick={() => {
                           setEditingStat(stat);
@@ -914,7 +1043,7 @@ export default function AdminPartnershipsPage() {
         )}
       </div>
 
-      {/* Category Modal */}
+      {/* Category Modal - Responsive */}
       {showCategoryModal && (
         <Modal
           title={editingCategory ? 'ক্যাটাগরি সম্পাদনা' : 'নতুন ক্যাটাগরি'}
@@ -926,13 +1055,13 @@ export default function AdminPartnershipsPage() {
           onSubmit={handleCategorySubmit}
           submitting={submitting}
         >
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <input
               type="text"
               placeholder="ক্যাটাগরির নাম"
               value={categoryForm.name}
               onChange={(e) => setCategoryForm({...categoryForm, name: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
               required
             />
             <input
@@ -940,7 +1069,7 @@ export default function AdminPartnershipsPage() {
               placeholder="আইকন (যেমন: 🤝)"
               value={categoryForm.icon}
               onChange={(e) => setCategoryForm({...categoryForm, icon: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
               maxLength={2}
             />
             <textarea
@@ -948,10 +1077,10 @@ export default function AdminPartnershipsPage() {
               value={categoryForm.description || ''}
               onChange={(e) => setCategoryForm({...categoryForm, description: e.target.value})}
               rows={3}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
             />
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <label className="flex items-center gap-2 text-sm sm:text-base">
                 <input
                   type="checkbox"
                   checked={categoryForm.status === 'active'}
@@ -965,7 +1094,7 @@ export default function AdminPartnershipsPage() {
                 placeholder="ক্রম"
                 value={categoryForm.sort_order}
                 onChange={(e) => setCategoryForm({...categoryForm, sort_order: parseInt(e.target.value)})}
-                className="w-20 px-3 py-2 border rounded-lg"
+                className="w-full sm:w-20 px-3 py-2 border rounded-lg text-sm sm:text-base"
                 min="0"
               />
             </div>
@@ -973,7 +1102,7 @@ export default function AdminPartnershipsPage() {
         </Modal>
       )}
 
-      {/* Partnership Modal */}
+      {/* Partnership Modal - Responsive */}
       {showPartnershipModal && (
         <Modal
           title={editingPartnership ? 'পার্টনার সম্পাদনা' : 'নতুন পার্টনার'}
@@ -985,11 +1114,11 @@ export default function AdminPartnershipsPage() {
           onSubmit={handlePartnershipSubmit}
           submitting={submitting}
         >
-          <div className="space-y-4 max-h-[70vh] overflow-y-auto p-1">
+          <div className="space-y-3 sm:space-y-4 max-h-[70vh] overflow-y-auto p-1">
             {/* Image Upload */}
             <div>
               {partnershipForm.image_url && (
-                <div className="relative w-32 h-32 mx-auto mb-4">
+                <div className="relative w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-4">
                   <Image
                     src={partnershipForm.image_url}
                     alt="Preview"
@@ -1008,7 +1137,7 @@ export default function AdminPartnershipsPage() {
                     }}
                     className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
                   </button>
                 </div>
               )}
@@ -1016,14 +1145,14 @@ export default function AdminPartnershipsPage() {
                 type="file"
                 accept="image/*"
                 onChange={handlePartnershipImageUpload}
-                className="w-full"
+                className="w-full text-sm"
               />
             </div>
 
             <select
               value={partnershipForm.category_id}
               onChange={(e) => setPartnershipForm({...partnershipForm, category_id: parseInt(e.target.value)})}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
               required
             >
               <option value="">ক্যাটাগরি নির্বাচন করুন</option>
@@ -1037,17 +1166,17 @@ export default function AdminPartnershipsPage() {
               placeholder="নাম"
               value={partnershipForm.name}
               onChange={(e) => setPartnershipForm({...partnershipForm, name: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
               required
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <input
                 type="text"
                 placeholder="লোগো (যেমন: 🏛️)"
                 value={partnershipForm.logo}
                 onChange={(e) => setPartnershipForm({...partnershipForm, logo: e.target.value})}
-                className="px-3 py-2 border rounded-lg"
+                className="px-3 py-2 border rounded-lg text-sm sm:text-base"
                 maxLength={2}
               />
               <input
@@ -1055,18 +1184,18 @@ export default function AdminPartnershipsPage() {
                 placeholder="ধরন (যেমন: কেন্দ্রীয় সদস্য)"
                 value={partnershipForm.type}
                 onChange={(e) => setPartnershipForm({...partnershipForm, type: e.target.value})}
-                className="px-3 py-2 border rounded-lg"
+                className="px-3 py-2 border rounded-lg text-sm sm:text-base"
                 required
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <input
                 type="text"
                 placeholder="সহযোগিতা কাল (যেমন: ২০২৫)"
                 value={partnershipForm.since}
                 onChange={(e) => setPartnershipForm({...partnershipForm, since: e.target.value})}
-                className="px-3 py-2 border rounded-lg"
+                className="px-3 py-2 border rounded-lg text-sm sm:text-base"
                 required
               />
               <input
@@ -1074,7 +1203,7 @@ export default function AdminPartnershipsPage() {
                 placeholder="ওয়েবসাইট"
                 value={partnershipForm.website || ''}
                 onChange={(e) => setPartnershipForm({...partnershipForm, website: e.target.value})}
-                className="px-3 py-2 border rounded-lg"
+                className="px-3 py-2 border rounded-lg text-sm sm:text-base"
               />
             </div>
 
@@ -1083,34 +1212,34 @@ export default function AdminPartnershipsPage() {
               value={partnershipForm.description}
               onChange={(e) => setPartnershipForm({...partnershipForm, description: e.target.value})}
               rows={3}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
               required
             />
 
             <div className="border-t pt-4">
-              <h3 className="font-semibold mb-2">যোগাযোগের তথ্য (ঐচ্ছিক)</h3>
+              <h3 className="font-semibold mb-2 text-sm sm:text-base">যোগাযোগের তথ্য (ঐচ্ছিক)</h3>
               <div className="space-y-2">
                 <input
                   type="text"
                   placeholder="যোগাযোগ ব্যক্তি"
                   value={partnershipForm.contact_person || ''}
                   onChange={(e) => setPartnershipForm({...partnershipForm, contact_person: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <input
                     type="email"
                     placeholder="ইমেইল"
                     value={partnershipForm.contact_email || ''}
                     onChange={(e) => setPartnershipForm({...partnershipForm, contact_email: e.target.value})}
-                    className="px-3 py-2 border rounded-lg"
+                    className="px-3 py-2 border rounded-lg text-sm sm:text-base"
                   />
                   <input
                     type="text"
                     placeholder="ফোন"
                     value={partnershipForm.contact_phone || ''}
                     onChange={(e) => setPartnershipForm({...partnershipForm, contact_phone: e.target.value})}
-                    className="px-3 py-2 border rounded-lg"
+                    className="px-3 py-2 border rounded-lg text-sm sm:text-base"
                   />
                 </div>
                 <textarea
@@ -1118,13 +1247,13 @@ export default function AdminPartnershipsPage() {
                   value={partnershipForm.address || ''}
                   onChange={(e) => setPartnershipForm({...partnershipForm, address: e.target.value})}
                   rows={2}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
                 />
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <label className="flex items-center gap-2 text-sm sm:text-base">
                 <input
                   type="checkbox"
                   checked={partnershipForm.is_featured}
@@ -1133,7 +1262,7 @@ export default function AdminPartnershipsPage() {
                 />
                 ফিচার্ড
               </label>
-              <label className="flex items-center gap-2">
+              <label className="flex items-center gap-2 text-sm sm:text-base">
                 <input
                   type="checkbox"
                   checked={partnershipForm.status === 'active'}
@@ -1147,7 +1276,7 @@ export default function AdminPartnershipsPage() {
                 placeholder="ক্রম"
                 value={partnershipForm.sort_order}
                 onChange={(e) => setPartnershipForm({...partnershipForm, sort_order: parseInt(e.target.value)})}
-                className="w-20 px-3 py-2 border rounded-lg"
+                className="w-full sm:w-20 px-3 py-2 border rounded-lg text-sm sm:text-base"
                 min="0"
               />
             </div>
@@ -1155,7 +1284,7 @@ export default function AdminPartnershipsPage() {
         </Modal>
       )}
 
-      {/* Collaboration Modal */}
+      {/* Collaboration Modal - Responsive */}
       {showCollaborationModal && (
         <Modal
           title={editingCollaboration ? 'সহযোগিতার ধরন সম্পাদনা' : 'নতুন সহযোগিতার ধরন'}
@@ -1167,13 +1296,13 @@ export default function AdminPartnershipsPage() {
           onSubmit={handleCollaborationSubmit}
           submitting={submitting}
         >
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <input
               type="text"
               placeholder="নাম (যেমন: কেন্দ্রীয় সদস্য)"
               value={collaborationForm.name}
               onChange={(e) => setCollaborationForm({...collaborationForm, name: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
               required
             />
             <input
@@ -1181,7 +1310,7 @@ export default function AdminPartnershipsPage() {
               placeholder="সংখ্যা (যেমন: ১টি)"
               value={collaborationForm.count}
               onChange={(e) => setCollaborationForm({...collaborationForm, count: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
               required
             />
             <input
@@ -1189,10 +1318,10 @@ export default function AdminPartnershipsPage() {
               placeholder="রঙ (যেমন: bg-purple-100 text-purple-800)"
               value={collaborationForm.color}
               onChange={(e) => setCollaborationForm({...collaborationForm, color: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
             />
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <label className="flex items-center gap-2 text-sm sm:text-base">
                 <input
                   type="checkbox"
                   checked={collaborationForm.status === 'active'}
@@ -1206,7 +1335,7 @@ export default function AdminPartnershipsPage() {
                 placeholder="ক্রম"
                 value={collaborationForm.sort_order}
                 onChange={(e) => setCollaborationForm({...collaborationForm, sort_order: parseInt(e.target.value)})}
-                className="w-20 px-3 py-2 border rounded-lg"
+                className="w-full sm:w-20 px-3 py-2 border rounded-lg text-sm sm:text-base"
                 min="0"
               />
             </div>
@@ -1214,7 +1343,7 @@ export default function AdminPartnershipsPage() {
         </Modal>
       )}
 
-      {/* Stat Modal */}
+      {/* Stat Modal - Responsive */}
       {showStatModal && (
         <Modal
           title={editingStat ? 'পরিসংখ্যান সম্পাদনা' : 'নতুন পরিসংখ্যান'}
@@ -1226,13 +1355,13 @@ export default function AdminPartnershipsPage() {
           onSubmit={handleStatSubmit}
           submitting={submitting}
         >
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <input
               type="text"
               placeholder="লেবেল (যেমন: মোট পার্টনার)"
               value={statForm.label}
               onChange={(e) => setStatForm({...statForm, label: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
               required
             />
             <input
@@ -1240,7 +1369,7 @@ export default function AdminPartnershipsPage() {
               placeholder="মান (যেমন: ১৫+)"
               value={statForm.value}
               onChange={(e) => setStatForm({...statForm, value: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
               required
             />
             <input
@@ -1248,7 +1377,7 @@ export default function AdminPartnershipsPage() {
               placeholder="আইকন (যেমন: 🤝)"
               value={statForm.icon || ''}
               onChange={(e) => setStatForm({...statForm, icon: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
               maxLength={2}
             />
             <textarea
@@ -1256,10 +1385,10 @@ export default function AdminPartnershipsPage() {
               value={statForm.description || ''}
               onChange={(e) => setStatForm({...statForm, description: e.target.value})}
               rows={2}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg text-sm sm:text-base"
             />
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <label className="flex items-center gap-2 text-sm sm:text-base">
                 <input
                   type="checkbox"
                   checked={statForm.status === 'active'}
@@ -1273,7 +1402,7 @@ export default function AdminPartnershipsPage() {
                 placeholder="ক্রম"
                 value={statForm.sort_order}
                 onChange={(e) => setStatForm({...statForm, sort_order: parseInt(e.target.value)})}
-                className="w-20 px-3 py-2 border rounded-lg"
+                className="w-full sm:w-20 px-3 py-2 border rounded-lg text-sm sm:text-base"
                 min="0"
               />
             </div>
@@ -1284,31 +1413,31 @@ export default function AdminPartnershipsPage() {
   );
 }
 
-// Reusable Modal Component
+// Reusable Modal Component - Responsive
 function Modal({ title, children, onClose, onSubmit, submitting }: ModalProps) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">{title}</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
+            <h2 className="text-lg sm:text-xl font-bold">{title}</h2>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">✕</button>
           </div>
           {onSubmit ? (
             <form onSubmit={onSubmit} className="space-y-4">
               {children}
-              <div className="flex justify-end gap-3 pt-4 border-t">
+              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4 border-t">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50"
+                  className="w-full sm:w-auto px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50 text-sm sm:text-base order-2 sm:order-1"
                 >
                   বাতিল
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base order-1 sm:order-2"
                 >
                   {submitting ? 'সেভ হচ্ছে...' : 'সেভ করুন'}
                 </button>
@@ -1320,7 +1449,7 @@ function Modal({ title, children, onClose, onSubmit, submitting }: ModalProps) {
               <div className="flex justify-end">
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                  className="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm sm:text-base"
                 >
                   বন্ধ করুন
                 </button>
