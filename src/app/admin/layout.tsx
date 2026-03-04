@@ -191,6 +191,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   >
                    অর্জনসমূহ
                   </Link>
+                  <Link 
+                    href="/admin/contact" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    onClick={closeMenu}
+                  >
+                   যোগাযোগ
+                  </Link>
                 </div>
               </>
             )}
