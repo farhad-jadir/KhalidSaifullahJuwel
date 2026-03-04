@@ -205,6 +205,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   >
                    পার্টনারশিপ
                   </Link>
+                  <Link 
+                    href="/admin/gallery" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    onClick={closeMenu}
+                  >
+                   গ্যালারি
+                  </Link>
                 </div>
               </>
             )}
